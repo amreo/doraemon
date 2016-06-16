@@ -2,6 +2,9 @@
 
 use Mojolicious::Lite;
 use Config::IniFiles;
+use Digest::MD5 qw(md5);
+use MIME::Base64;
+use Crypt::ECB;
 use Net::Ping;
 use Net::ARP;
 use esmith::DB::db;
@@ -14,6 +17,8 @@ use Data::Dumper;
 
 # TODO: percorso doraemon.ini
 my $cfg = Config::IniFiles->new( -file => "doraemon.ini" );
+my $db_hosts = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
+my $db_roles = esmith::DB::db->open('roles') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
 
 
 get '/' => {text => 'Go away!'};
@@ -48,8 +53,7 @@ get '/mgmtkey' => sub {
 
 get '/epoptes-srv' => sub {
 	my $c = shift;
-	my $db = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
-	my @results = $db->get_all_by_prop(Role => 'docenti');
+	my @results = $db_hosts->get_all_by_prop(Role => 'docenti');
 	if (@results) {
 		$c->render(text => $results[0]->key);
 	} else {
@@ -101,11 +105,12 @@ get '/mac2hostname' => sub {
 	my $mac = $c->param('mac');
 	if (! $mac) {
 		$c->render(text => 'Usage: GET /mac2hostname?mac=XX_XX_XX_XX_XX_XX[&base=YYY][&role=ZZZ]');
+	} else {
+	  my $role = $c->param('role') || $defaultrole;
+	  my $base = $c->param('base') || $defaultbase;
+	  my $hostname = $c->new_hostname($mac, $base, $role);
+	  $c->render(text => $hostname );
 	}
-	my $role = $c->param('role') || $defaultrole;
-	my $base = $c->param('base') || $defaultbase;
-	my $hostname = $c->new_hostname($mac, $base, $role);
-	$c->render(text => $hostname);
 };
 
 get '/whatsmyhostname' => sub {
@@ -142,7 +147,6 @@ helper 'new_hostname' => sub {
 	my $digits = $cfg->val('NameSettings', 'Digits') || 2;
 	my $formatstring = '%s-%0'.$digits.'d';
 	my $hostname;
-  my $db = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
   	my $nr=0;
 	while (1) {
 		$nr++;
@@ -150,11 +154,11 @@ helper 'new_hostname' => sub {
 		if ($domainname ne '') {
 			$hostname .= '.' . $domainname;
 		}
-		if (!$db->get($hostname)) {
+		if (!$db_hosts->get($hostname)) {
 			last;
 		}
 	}
-	$client = $db->new_record($hostname, {
+	$client = $db_hosts->new_record($hostname, {
 		'type' 			=> 'remote',
 		'MacAddress'    => $mac,
 		'Role'   		=> $role,
@@ -162,16 +166,41 @@ helper 'new_hostname' => sub {
 	return $hostname;
 };
 
+get '/vaultpass' => sub {
+	my $c = shift;
+	my $vaultPassFile = $cfg->val('Files', 'VaultPassFile') || '/home/amgmt/.ansible/vault.txt';
+
+	open my $ifh, '<', $vaultPassFile
+  		or die "Cannot open '$vaultPassFile' for reading: $!";
+	# TODO: error check (file unreadable?)
+	local $/ = '';
+	my $contents = <$ifh>;
+	close($ifh);
+
+	my $client = $c->get_client;
+	if ( ! $client ) {
+		die "Sorry, no luck.";
+	}
+	my $hostname = $client->key;
+	my $key = md5($hostname);
+	$contents =~ s/^\s+|\s+$//g;	# trim blanks
+	my $padlenght = 16 - (length($contents) % 16);
+  $contents .= 'x' x $padlenght;
+  my $m = Crypt::ECB->new();
+  $m->cipher('Crypt::OpenSSL::AES');
+  $m->key($key);
+  my $ciphertext = $m->encrypt($contents);
+	my $encoded = MIME::Base64::encode($ciphertext);
+	$c->render(text => $encoded);
+};
 
 #  def __route(self):
 #    self.__app.get('/hosts', callback=self.hosts)
-#    self.__app.get('/vaultpass', callback=self.vaultpass)
 
 helper 'get_client' => sub {
   my $c = shift;
   my $mac = $c->get_client_mac;
-  my $db = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
-  my @results = $db->get_all_by_prop(MacAddress => $mac);
+  my @results = $db_hosts->get_all_by_prop('MacAddress' => $mac);
   if (@results) {
 	  return $results[0];
   } else {
@@ -185,16 +214,15 @@ helper 'get_client_mac' => sub {
   # $c->tx->original_remote_address
   my $p = Net::Ping->new();
   $p->ping($remote_addr, 1);
-  # TODO: parametrizzare eth0 ??
-  my $mac = Net::ARP::arp_lookup("eth0",$remote_addr);
+  my $adapter = $cfg->val('Daemon', 'Adapter') || 'lan0';
+  my $mac = Net::ARP::arp_lookup($adapter, $remote_addr);
   return $mac;
 };
 
 helper 'role_vars' => sub {
   my $c = shift;
   my $role = shift;
-  my $db = esmith::DB::db->open('roles') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
-  my @results = $db->get($role);
+  my @results = $db_roles->get($role);
   if (@results) {
 	  return {
 		  role => $role,
@@ -209,13 +237,12 @@ helper 'role_vars' => sub {
 get '/hosts' => sub {
  	my $c = shift;
   	my $role = $c->param('role');
-  	my $db = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
   	my @results;
   	my @data;
   	if ( $role ) {
-		@results = $db->get_all_by_prop(Role => $role);
+		@results = $db_hosts->get_all_by_prop(Role => $role);
   	} else {
-		@results = $db->get_all;
+		@results = $db_hosts->get_all;
   	}
 
   	foreach my $r (@results) {
