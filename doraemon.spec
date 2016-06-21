@@ -6,7 +6,7 @@ URL: https://github.com/bglug-it/doraemon/
 License: GPLv2+
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: python python-bottle python-crypto2.6 perl-config-IniFiles perl-Net-ARP perl-Crypt-ECB perl-Crypt-OpenSSL-AES nethserver-base
+Requires: python python-bottle python-crypto2.6 perl-config-IniFiles perl-Net-ARP perl-Crypt-ECB perl-File-Pid perl-Crypt-OpenSSL-AES nethserver-base
 Requires(post): chkconfig nethserver-base
 Requires(preun): chkconfig initscripts nethserver-base
 Source0: doraemon-1.2.1.tar.gz

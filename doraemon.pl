@@ -9,6 +9,7 @@ use Net::Ping;
 use Net::ARP;
 use esmith::DB::db;
 use esmith::ConfigDB;
+use File::Pid;
 
 
 use Data::Dumper;
@@ -17,10 +18,18 @@ use Data::Dumper;
 
 # TODO: percorso doraemon.ini
 my $cfg = Config::IniFiles->new( -file => "doraemon.ini" );
+
+# connect to e-smith db
 my $db_hosts = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
 my $db_roles = esmith::DB::db->open('roles') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
 
+# PID file management
+my $cfg_pidfile = $cfg->val('Daemon', 'PIDFile') || "/var/run/doraemon.pid"; 
+my $pidfile = File::Pid->new({file => $cfg_pidfile});
+exit if $pidfile->running();
+$pidfile->write or die "Can't write PID file, /dev/null: $!";
 
+# unused request, maybe we can add docs here?
 get '/' => {text => 'Go away!'};
 
 get '/domain' => sub {
@@ -194,9 +203,6 @@ get '/vaultpass' => sub {
 	$c->render(text => $encoded);
 };
 
-#  def __route(self):
-#    self.__app.get('/hosts', callback=self.hosts)
-
 helper 'get_client' => sub {
   my $c = shift;
   my $mac = $c->get_client_mac;
@@ -253,12 +259,15 @@ get '/hosts' => sub {
 	  	};
   	}
 
-  	$c->render(json => @data );
+  	$c->render(json => [@data] );
 };
-
-
 
 
 
 app->start;
 #app->start('daemon', '-l', 'http://*:8888');
+
+# TODO:    'BindAddress' 'Port'
+    
+
+$pidfile->remove();
