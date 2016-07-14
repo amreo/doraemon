@@ -30,7 +30,7 @@ install -d -m 755 %{buildroot}%{_initrddir}
 install -m 755 initrd %{buildroot}%{_initrddir}/%{name}
 # Installo lo script vero e proprio
 install -d -m 755 %{buildroot}%{_bindir}
-install -m 755 doraemon.py %{buildroot}%{_bindir}/%{name}.py
+install -m 755 doraemon.pl %{buildroot}%{_bindir}/%{name}.pl
 # Cartella del database
 install -d %{buildroot}%{_sharedstatedir}/%{name}
 # File per il rotate
@@ -80,6 +80,9 @@ rm -rf %{buildroot}
 %{_sysconfdir}/e-smith/db/configuration/defaults/%{name}/TCPPort
 
 %changelog
+* TODO: DATE Paolo Asperti <paolo-AT-asperti.com> - 1.3.0-1.ns6
+- Perl rewrite
+
 * Tue Oct 27 2015 Emiliano Vavassori <syntaxerrormmm-AT-gmail.com> - 1.2.1-2.ns6
 - Packing corrections to rpm to fix upgrading issue
 
