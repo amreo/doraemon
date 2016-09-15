@@ -143,7 +143,7 @@ function ROUTE_epoptes_srv() {
         echo 'none';
     } else {
         $host = array_pop($hosts);
-        echo json_encode($host);
+        echo $host['name'];
     }
 }
 
