@@ -37,8 +37,10 @@ function varsForRole($role, $json=true) {
     $result = $roles_db->getKey($role);
     $return = array('role'=>$role,'delpkg'=>'','addpkg'=>'');
     if (is_array($result)) {
-        if (is_string($result['Addpkg'])) $return['addpkg'] = $result['Addpkg'];
-        if (is_string($result['Delpkg'])) $return['delpkg'] = $result['Delpkg'];
+        if (is_string($result['Addpkg']))
+            $return['addpkg'] = preg_split("/[\s,]+/", $result['Addpkg']);
+        if (is_string($result['Delpkg']))
+            $return['delpkg'] = preg_split("/[\s,]+/", $result['Delpkg']);
     }
     if ($json) {
         return json_encode($return);
