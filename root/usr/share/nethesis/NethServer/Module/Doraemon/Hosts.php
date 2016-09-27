@@ -24,6 +24,9 @@ class Hosts extends \Nethgui\Controller\TableController
             ->addRowAction(new \NethServer\Module\Doraemon\Hosts\TogglePower('shutdown'))
             ->addRowAction(new \NethServer\Module\Doraemon\Hosts\Modify('delete'))
             ->addTableAction(new \NethServer\Module\Doraemon\Hosts\Modify('create'))
+            ->addTableAction(new \NethServer\Module\Doraemon\Hosts\TogglePowerAll('wake-all'))
+            ->addTableAction(new \NethServer\Module\Doraemon\Hosts\TogglePowerAll('reboot-all'))
+            ->addTableAction(new \NethServer\Module\Doraemon\Hosts\TogglePowerAll('shutdown-all'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
         ;
 

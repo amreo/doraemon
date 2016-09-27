@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+
+package esmith;
+
+use strict;
+use Errno;
+use esmith::DB::db;
+use IO::File;
+use English;
+
+my $db_hosts = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
+
+my @items = $db_hosts->get_all('remote');
+foreach my $item (@items) {
+  my $hostName = $item->key;
+  system("/usr/bin/sudo -u amgmt /usr/bin/ssh -o StrictHostKeyChecking=no amgmt\@$hostName /usr/bin/sudo /sbin/reboot &") == 0
+      or die "Error rebooting $hostName";
+}
+
+exit 0;

@@ -8,3 +8,6 @@ $L['MacAddress_label'] = 'MAC Address';
 $L['shutdown_label'] = 'Shutdown';
 $L['reboot_label'] = 'Reboot';
 $L['wake_label'] = 'Wake Up';
+$L['shutdown-all_label'] = 'Shutdown all';
+$L['reboot-all_label'] = 'Reboot all';
+$L['wake-all_label'] = 'Wake Up all';
