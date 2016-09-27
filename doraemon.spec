@@ -79,7 +79,7 @@ if [ "$1" = 2 ]; then
   if [ -f $DATABASE ]; then
     sqlite3 -separator " " $DATABASE \
       "select * from client" | while read id hostname mac role; do
-      /sbin/e-smith/db hosts set $hostname remote \
+      /sbin/e-smith/db hosts set $hostname local \
         MacAddress $mac Role $role
     done
     rm $DATABASE

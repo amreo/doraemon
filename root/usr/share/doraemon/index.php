@@ -108,7 +108,7 @@ function newHostname($mac, $base, $role) {
 #        }
     } while ($hosts_db->getKey($hostname));
 
-    $hosts_db->setKey($hostname, 'remote', array(
+    $hosts_db->setKey($hostname, 'local', array(
 		'MacAddress'    => $mac,
 		'Role'   		=> $role,
 		'Description' 	=> ''
@@ -165,7 +165,7 @@ function ROUTE_hosts() {
     if (isset($get_params['role'])) {
         $items = $hosts_db->getAllByProp('Role', $get_params['role']);
     } else {
-        $items = $hosts_db->getAll('remote');
+        $items = $hosts_db->getAll('local');
     }
     $results=array();
     foreach ($items as $name=>$item) {

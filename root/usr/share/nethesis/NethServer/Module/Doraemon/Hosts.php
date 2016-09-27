@@ -16,7 +16,7 @@ class Hosts extends \Nethgui\Controller\TableController
         );
 
         $this
-            ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'remote'))
+            ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'local'))
             ->setColumns($columns)
             ->addRowAction(new \NethServer\Module\Doraemon\Hosts\Modify('update'))
             ->addRowAction(new \NethServer\Module\Doraemon\Hosts\TogglePower('wake'))

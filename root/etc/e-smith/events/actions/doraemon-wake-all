@@ -10,7 +10,7 @@ use English;
 
 my $db_hosts = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
 
-my @items = $db_hosts->get_all('remote');
+my @items = $db_hosts->get_all('local');
 foreach my $item (@items) {
   my $hostName = $item->key;
   my $mac = $item->prop('MacAddress');
