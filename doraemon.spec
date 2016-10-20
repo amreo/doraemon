@@ -1,7 +1,7 @@
 Summary: Helps client to join domain and maintain itself
 Name: doraemon
 Version: 2.0.0
-Release: 7.ns6
+Release: 8.ns6
 URL: https://github.com/bglug-it/doraemon/
 License: GPLv2+
 Packager: Paolo Asperti <paolo@asperti.com>
@@ -41,6 +41,7 @@ mkdir -p %{buildroot}%{_localstatedir}/cache/doraemon
 #fi
 if [ "$1" = 2 ]; then
   #upgrade
+  /sbin/service %{name} stop >/dev/null 2>&1 || :
   /sbin/stop %{name} >/dev/null 2>&1 || :
   DATABASE=/var/lib/doraemon/doraemon.db
   INI=/etc/doraemon.ini
