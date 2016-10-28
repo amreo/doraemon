@@ -1,0 +1,6 @@
+---
+# BgLUG customization
+
+- include: apt-proxies.yml
+  tags:
+    - proxy-client

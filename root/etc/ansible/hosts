@@ -1,0 +1,8 @@
+[clients:vars]
+ansible_ssh_private_key_file=/home/amgmt/.ssh/id_rsa
+ansible_user=amgmt
+
+[clients]
+lab-01.mastri.edu
+lab-02.mastri.edu
+

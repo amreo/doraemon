@@ -1,0 +1,7 @@
+---
+
+- hosts: clients
+  user: root
+
+  roles:
+    - proxy-client
