@@ -4,4 +4,5 @@
   user: root
 
   roles:
-    - proxy-client
+    - common
+    - { role: proxy-client, when: proxy_status == 'enabled' }

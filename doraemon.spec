@@ -85,6 +85,11 @@ if [ "$1" = 2 ]; then
     done
     rm $DATABASE
   fi
+  V1=$(/sbin/e-smith/db configuration getprop doraemon ManagementPrivateKeyFile)
+  if [ "a$V1" == "a" ] ; then
+    V2=$(/sbin/e-smith/db configuration getprop doraemon ManagementKeyFile | sed "s/\.pub$//")
+    /sbin/e-smith/db configuration setprop doraemon ManagementPrivateKeyFile "$V2"
+  fi
 fi
 
 %post
