@@ -13,6 +13,7 @@ my $db_hosts = esmith::DB::db->open('hosts') || die("Could not open e-smith db (
 my $db_configuration = esmith::DB::db->open('configuration') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
 
 my @hostnames = ();
+my %hostnames_map = ();
 my %vars = ();
 
 $vars{"proxy_status"} = $db_configuration->get_prop('squid', 'status');
@@ -23,6 +24,7 @@ my $domainname = $db_configuration->get_prop('DomainName','type');
 
 my @items = $db_hosts->get_all('local');
 foreach my $item (@items) {
+  $hostnames_map{$item} = $item->key . '.' . $domainname;
   push @hostnames, $item->key . '.' . $domainname;
 }
 

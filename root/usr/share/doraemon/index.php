@@ -114,7 +114,26 @@ function newHostname($mac, $base, $role) {
 		'Description' 	=> ''
     ));
 
+    signalEvent('doraemon-reconfigure', $hostname);
+
     echo $hostname;
+}
+
+function signalEvent($eventSpecification, $arguments = array())
+{
+    $cmd = array(
+        escapeshellcmd('/usr/bin/sudo -n /sbin/e-smith/signal-event'),
+        escapeshellarg($eventSpecification)
+    );
+    if (is_array($arguments)) {
+        $a = array_map('escapeshellarg', $arguments);
+        $cmd = array_merge($cmd, $a);
+    } else {
+        $cmd[] = escapeshellarg($arguments);
+    }
+
+    exec(join(' ',$cmd));
+    return true;
 }
 
 function pingHost($host, $timeout=1) {
@@ -122,7 +141,26 @@ function pingHost($host, $timeout=1) {
     return (0 == $retvar);
 }
 
+function ROUTE_reconfigureme() {
+  global $config_db;
+  $mac = getClientMac();
+  if (!$mac) {
+    echo 'no-mac-address';
+    return false;
+  }
+  if (!$client=getClient($mac)) {
+      echo 'unknown client';
+      return false;
+  }
+  $hostname = $client['name'];
+  signalEvent('doraemon-reconfigure', $hostname);
+  echo "$hostname \n";
+}
 
+function ROUTE_ping() {
+    // TODO: controllare ultimo aggiornamento
+    ROUTE_reconfigureme();
+}
 
 function ROUTE_domain() {
     global $config_db;

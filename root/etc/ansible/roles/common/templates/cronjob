@@ -1,0 +1,2 @@
+*/5 * * * * root /usr/bin/curl "http://{{ ansible_local.domain.serverfqdn }}:3000/ping"
+@reboot root /usr/bin/curl "http://{{ ansible_local.domain.serverfqdn }}:3000/ping"
