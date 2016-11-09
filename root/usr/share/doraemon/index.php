@@ -85,7 +85,7 @@ function newHostname($mac, $base, $role) {
     global $config_db;
     global $hosts_db;
     if(!preg_match('/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/', $mac)) {
-        echo "invalid mac address";
+        echo "invalid mac address: $mac";
         return;
     }
 
