@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+
+package esmith;
+
+use strict;
+use Errno;
+use esmith::DB::db;
+use IO::File;
+use English;
+use JSON;
+
+my $db_configuration = esmith::DB::db->open('configuration') || die("{}");
+my @items = $db_configuration->get_all();
+my %out;
+foreach my $item (@items) {
+	$out{$item->key} = { $item->props() };
+}
+
+print encode_json \%out;

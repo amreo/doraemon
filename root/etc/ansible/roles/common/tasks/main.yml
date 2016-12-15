@@ -1,5 +1,10 @@
 ---
 
+- name: Import e-smith configuration db
+  e-smith:
+  register: esmith
+  delegate_to: localhost
+
 - name: Set hostname
   hostname: name={{inventory_hostname}}
 
