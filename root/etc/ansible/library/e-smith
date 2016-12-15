@@ -13,7 +13,12 @@ my $db_configuration = esmith::DB::db->open('configuration') || die("{}");
 my @items = $db_configuration->get_all();
 my %out;
 foreach my $item (@items) {
-	$out{$item->key} = { $item->props() };
+  my %props = $item->props();
+ 	if (scalar(keys %props) <= 1 ) {
+    $out{$item->key} = $props{'type'};
+  } else {
+    $out{$item->key} = { $item->props() };
+  }
 }
 
 print encode_json \%out;

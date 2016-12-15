@@ -1,2 +1,2 @@
-*/5 * * * * root /usr/bin/curl --noproxy '*' "http://{{ ansible_local.domain.serverfqdn }}:{{ esmith.doraemon.TCPPort }}/ping"
-@reboot root /usr/bin/curl --noproxy '*' "http://{{ ansible_local.domain.serverfqdn }}:{{ esmith.doraemon.TCPPort }}/ping"
+*/5 * * * * root /usr/bin/curl --noproxy '*' "http://{{ esmith.SystemName }}.{{ esmith.DomainName }}:{{ esmith.doraemon.TCPPort }}/ping"
+@reboot root /usr/bin/curl --noproxy '*' "http://{{ esmith.SystemName }}.{{ esmith.DomainName }}:{{ esmith.doraemon.TCPPort }}/ping"

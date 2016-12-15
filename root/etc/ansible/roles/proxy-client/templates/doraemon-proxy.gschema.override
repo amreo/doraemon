@@ -3,9 +3,9 @@ mode = 'manual'
 autoconfig-url = 'http://pdc.mastri.edu/wpad.dat'
 
 [org.gnome.system.proxy.http]
-host = '{{ ansible_local.domain.serverfqdn }}'
+host = '{{ esmith.SystemName }}.{{ esmith.DomainName }}'
 port = 3128
 
 [org.gnome.system.proxy.https]
-host = '{{ ansible_local.domain.serverfqdn }}'
+host = '{{ esmith.SystemName }}.{{ esmith.DomainName }}'
 port = 3128
