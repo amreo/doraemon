@@ -23,3 +23,12 @@
     group: root
     mode: 0644
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: rc.local command to check if apt is pending
+  blockinfile:
+    dest: /etc/rc.local
+    block: |
+      apt-get check >/dev/null 2>&1
+      if [ "$?" -ne 0 ]; then
+        apt-get -f -y install
+      fi
