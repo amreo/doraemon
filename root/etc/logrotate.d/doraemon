@@ -1,0 +1,9 @@
+/var/log/doraemon/*log {
+    missingok
+    notifempty
+    sharedscripts
+    delaycompress
+    postrotate
+        /sbin/reload doraemon > /dev/null 2>/dev/null || true
+    endscript
+}

@@ -1,6 +1,0 @@
-/var/log/doraemon.log {
-	daily
-	rotate 15
-	compress
-	missingok
-}	

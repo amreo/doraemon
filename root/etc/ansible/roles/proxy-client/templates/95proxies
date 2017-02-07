@@ -1,0 +1,3 @@
+Acquire::http::proxy "http://{{ esmith.SystemName }}.{{ esmith.DomainName }}:3128/";
+Acquire::https::proxy "http://{{ esmith.SystemName }}.{{ esmith.DomainName }}:3128/";
+

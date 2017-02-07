@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+
+package esmith;
+
+use strict;
+use Errno;
+use esmith::DB::db;
+use IO::File;
+use English;
+
+my $db_hosts = esmith::DB::db->open('hosts') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
+my $db_configuration = esmith::DB::db->open('configuration') || die("Could not open e-smith db (" . esmith::DB::db->error . ")\n");
+my $domainname = $db_configuration->get_prop('DomainName','type');
+
+my $event = $ARGV [0];
+
+defined $ARGV[1] || die "No host specied";
+my $host = $ARGV[1];
+
+reconfigure_host($host);
+
+exit 0;
+
+sub reconfigure_host
+{
+    my ($hostName) = @_;
+
+    my $h = $db_hosts->get($hostName) or die "No host record for user $hostName";
+
+    my $fqdn = $hostName . '.' . $domainname;
+
+    system("/usr/bin/sudo -u amgmt /usr/bin/ansible-playbook -l $fqdn -v /etc/ansible/reconfigure_clients.yml") == 0
+        or die "Error reconfiguring $hostName";
+
+}

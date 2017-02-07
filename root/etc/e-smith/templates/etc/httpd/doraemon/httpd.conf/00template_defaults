@@ -1,0 +1,10 @@
+{
+    #
+    # 00template_defaults
+    #
+
+    $localAccess = '';   
+    $port = ${'doraemon'}{TCPPort} || "3000";
+
+    "";
+}

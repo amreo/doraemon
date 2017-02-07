@@ -1,0 +1,15 @@
+{
+    $OUT = 'srvmgr ALL=NOPASSWD: /bin/cat ';
+
+    use esmith::ConfigDB;
+    my $confdb = esmith::ConfigDB->open;
+    my $backup = $confdb->get('doraemon') or die "No doraemon db entry found\n";
+    my $VaultPassFile = $backup->prop('VaultPassFile') || '/home/amgmt/.ansible/vault.txt';
+    my $ManagementKeyFile = $backup->prop('ManagementKeyFile') || '/home/amgmt/.ssh/id_rsa.pub';
+    my $DomainFile = $backup->prop('DomainFile') || '/etc/domain.yml';
+
+    $OUT = 'srvmgr ALL=NOPASSWD: /bin/cat ' . $VaultPassFile . '
+srvmgr ALL=NOPASSWD: /bin/cat ' . $ManagementKeyFile .'
+srvmgr ALL=NOPASSWD: /bin/cat ' . $DomainFile;
+
+}

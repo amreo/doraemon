@@ -1,0 +1,16 @@
+---
+
+- name: Set apt proxies
+  template:
+    src: 95proxies
+    dest: /etc/apt/apt.conf.d/95proxies
+    force: yes
+
+
+- name: proxy gconf schema
+  template:
+    src: doraemon-proxy.gschema.override
+    dest: /usr/share/glib-2.0/schemas/doraemon-proxy.gschema.override
+    force: yes
+  notify:
+     - glib-compile-schemas

@@ -1,0 +1,34 @@
+---
+
+- name: Import e-smith configuration db
+  e-smith:
+  register: esmith
+  delegate_to: localhost
+
+- name: Set hostname
+  hostname: name={{inventory_hostname}}
+
+- name: Update /etc/hosts for localhost
+  lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line='127.0.0.1 localhost' owner=root group=root mode=0644
+
+- name: Update /etc/hosts for hostname
+  lineinfile: dest=/etc/hosts regexp='^127\.0\.1\.1' line='127.0.1.1 {{inventory_hostname}} {{inventory_hostname_short}}' owner=root group=root mode=0644
+
+- name: cron script
+  template:
+    src: cronjob
+    dest: /etc/cron.d/doraemon
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: rc.local command to check if apt is pending
+  blockinfile:
+    dest: /etc/rc.local
+    block: |
+      apt-get check >/dev/null 2>&1
+      if [ "$?" -ne 0 ]; then
+        apt-get -f -y install
+      fi

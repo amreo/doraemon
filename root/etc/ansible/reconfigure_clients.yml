@@ -1,0 +1,8 @@
+---
+
+- hosts: clients
+  user: root
+
+  roles:
+    - common
+    - { role: proxy-client, when: proxy_status == 'enabled' }

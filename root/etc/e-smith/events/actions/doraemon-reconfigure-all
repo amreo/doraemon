@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/usr/bin/sudo -u amgmt /usr/bin/ansible-playbook -v /etc/ansible/reconfigure_clients.yml
