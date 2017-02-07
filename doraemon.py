@@ -34,8 +34,8 @@ class MyApp:
     self.__pidfile = config.get('Daemon', 'PIDFile') if config.has_option('Daemon', 'PIDFile') else '/var/run/doraemon.pid'
     self.__bindaddress = config.get('Daemon', 'BindAddress') if config.has_option('Daemon', 'BindAddress') else '127.0.0.1'
     self.__port = config.getint('Daemon', 'Port') if config.has_option('Daemon',
-    'Port') else 8080
-    self.__defaultbase = config.get('NameSettings', 'Base') if config.has_option('NameSettings', 'Base') else 'client'
+    'Port') else 3000
+    self.__defaultbase = config.get('NameSettings', 'Base') if config.has_option('NameSettings', 'Base') else 'lab'
     self.__defaultrole = config.get('NameSettings', 'Role') if config.has_option('NameSettings', 'Role') else 'client'
     self.__namedigits = config.get('NameSettings', 'Digits') if config.has_option('NameSettings', 'Digits') else '2'
     self.__domainfile = config.get('Files', 'Domain') if config.has_option('Files', 'Domain') else None
