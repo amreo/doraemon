@@ -20,7 +20,7 @@ import re
 import os
 
 class MyApp:
-  def __init__(self, configfile = '/etc/mac2hostname.ini'):
+  def __init__(self, configfile = '/etc/doraemon.ini'):
     if not os.path.isfile(configfile):
       print "Cannot find main file, %s. Exiting." % configfile
       sys.exit(1)
