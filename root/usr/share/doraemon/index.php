@@ -81,7 +81,7 @@ function getClientMac($ip=false) {
     }
 }
 
-function newHostname($mac, $base, $role) {
+function newHostname($mac, /*$base,*/ $role, $labid) {
     global $config_db;
     global $hosts_db;
     if(!preg_match('/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/', $mac)) {
@@ -95,13 +95,14 @@ function newHostname($mac, $base, $role) {
     }
 
     $domainName = (string)$config_db->getKeyValue('DomainName');
-    $digits = $config_db->getProp(CONFIG_KEY,'NamingDigits');
-    $formatstring = '%s-%0'.$digits.'d';
+    //$digits = $config_db->getProp(CONFIG_KEY,'NamingDigits');
+    //$formatstring = '%s-%0'.$digits.'d';
+    $formatstring = $config_db->getKeyValue('HostNameFormat');
     $nr=0;
     $hostname = '';
     do {
         $nr++;
-        $hostname = sprintf($formatstring, $base, $nr);
+        $hostname = sprintf($formatstring, $labid, $nr);
 #       TODO: we'll use the hostname in future, maybe
 #        if (trim($domainName) != '') {
 #            $hostname .= '.' . $domainName;
@@ -109,9 +110,10 @@ function newHostname($mac, $base, $role) {
     } while ($hosts_db->getKey($hostname));
 
     $hosts_db->setKey($hostname, 'local', array(
-		'MacAddress'    => $mac,
+		'MacAddress'    	=> $mac,
 		'Role'   		=> $role,
-		'Description' 	=> ''
+		'Description' 		=> '',
+		'LabID' 		=> $labid
     ));
 
     signalEvent('doraemon-reconfigure', $hostname);
@@ -176,11 +178,28 @@ function ROUTE_mgmtkey() {
 
 function ROUTE_epoptes_srv() {
     global $hosts_db;
+    global $get_params;
+    global $config_db;
+   
+    if (isset($get_params['labid'])) {
+        $labid = $get_params['labid'];
+    } else {
+        $labid = $config_db->getProp(CONFIG_KEY,'DefaultLabID');
+    }
+    
     $hosts = $hosts_db->getAllByProp('Role','docenti');
-    if (count($hosts) == 0) {
+    
+    $hostsFiltered = array_filter(
+    	$hosts,
+    	function ($item) use ($labid) {
+        	return $item['labid'] == $labid;
+    	}
+	);
+    
+    if (count($hostsFiltered) == 0) {
         echo 'none';
     } else {
-        $host = array_pop($hosts);
+        $host = array_pop($hostsFiltered);
         echo $host['name'];
     }
 }
@@ -197,6 +216,10 @@ function ROUTE_ansible_host() {
     echo varsForRole($role);
 }
 
+/**
+ * @deprecated
+ * Will be removed!!! 
+ */
 function ROUTE_hosts() {
     global $hosts_db;
     global $get_params;
@@ -216,6 +239,10 @@ function ROUTE_hosts() {
     echo json_encode($results);
 }
 
+/**
+ * @deprecated
+ * Will be removed!!! 
+ */
 function ROUTE_ansible_list() {
     global $get_params;
     if (isset($get_params['role'])) {
@@ -261,9 +288,11 @@ function ROUTE_whatsmyhostname() {
       echo 'no-mac-address';
       return false;
     }
-    $base = $config_db->getProp(CONFIG_KEY,'NamingBase');
+    /*$base = $config_db->getProp(CONFIG_KEY,'NamingBase');*/
     $role = $config_db->getProp(CONFIG_KEY,'DefaultRole');
-    newHostname($mac, $base, $role);
+    $labid = $config_db->getProp(CONFIG_KEY,'DefaultLabID');
+    
+    newHostname($mac, /*$base,*/ $role, $labid);
 }
 
 function ROUTE_mac2hostname() {
@@ -271,7 +300,7 @@ function ROUTE_mac2hostname() {
     global $get_params;
     $mac = getClientMac();
     if (!$mac) {
-        echo 'Usage: GET /mac2hostname?mac=XX_XX_XX_XX_XX_XX[&base=YYY][&role=ZZZ]';
+        echo 'Usage: GET /mac2hostname?mac=XX_XX_XX_XX_XX_XX[&base=YYY][&role=ZZZ][&labid=WW]';
         return;
     }
 
@@ -281,11 +310,17 @@ function ROUTE_mac2hostname() {
         $role = $config_db->getProp(CONFIG_KEY,'DefaultRole');
     }
 
-    if (isset($get_params['base'])) {
-        $base = $get_params['base'];
+//    if (isset($get_params['base'])) {
+//        $base = $get_params['base'];
+//    } else {
+//        $base = $config_db->getProp(CONFIG_KEY,'NamingBase');
+//    }
+
+    if (isset($get_params['labid'])) {
+        $labid = $get_params['labid'];
     } else {
-        $base = $config_db->getProp(CONFIG_KEY,'NamingBase');
+        $labid = $config_db->getProp(CONFIG_KEY,'DefaultLabID');
     }
 
-    newHostname($mac, $base, $role);
+    newHostname($mac, /*$base,*/ $role, $labid);
 }
