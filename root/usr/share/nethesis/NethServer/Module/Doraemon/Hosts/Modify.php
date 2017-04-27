@@ -15,6 +15,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('hostname', Validate::HOSTNAME_SIMPLE, \Nethgui\Controller\Table\Modify::KEY),
             array('MacAddress', Validate::MACADDRESS, \Nethgui\Controller\Table\Modify::FIELD),
             array('Role', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
+			array('LabID', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
 //            array('Role', Validate::ROLES_COLLECTION ??? TODO!!!, \Nethgui\Controller\Table\Modify::FIELD),
         );
         $this->setSchema($parameterSchema);

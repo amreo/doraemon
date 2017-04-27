@@ -12,6 +12,7 @@ class Hosts extends \Nethgui\Controller\TableController
             'Key',
             'MacAddress',
             'Role',
+	    'LabID',
             'Actions',
         );
 
